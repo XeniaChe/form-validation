@@ -10,24 +10,26 @@ const App = () => {
 		name,
 		placeholder,
 		required,
-		isCorrect,
+		needToCheck,
 		isEmail
 	) {
 		this.basic = {
 			name: name,
 			placeholder: placeholder
 		};
-		this.value = '';
+		// this.value = '';
 		this.validation = {
 			required: required,
-			isCorrect: isCorrect,
+			needToCheck: needToCheck,
 			isEmail: isEmail
 		};
+		this.isValid = false;
 	};
+
 	const [ formState, setFormState ] = useState({
 		formFields: {
 			name: new formFieldsCreate(
-				'Firs name',
+				'First name',
 				'Your first name',
 				false,
 				false,
@@ -40,19 +42,19 @@ const App = () => {
 				false,
 				false
 			),
-			repeatPassword: new formFieldsCreate(
+			passwordCheck: new formFieldsCreate(
 				'Password check',
 				'Repeat your password',
 				true,
-				false,
+				true,
 				false
 			),
 			email: new formFieldsCreate(
-				'Email',
-				'Your email',
+				'e-mail',
+				'Your e-mail',
 				true,
 				false,
-				false
+				true
 			)
 		},
 		formValid: false
@@ -60,10 +62,11 @@ const App = () => {
 	const [ userInfo, setUserInfo ] = useState({
 		name: '',
 		password: '',
-		passwordRepeat: false,
-		eMail: ''
+		passwordCheck: '',
+		email: ''
 	});
 
+	//Array from form.formfields object
 	const fieldsArr = [];
 	for (const key in formState.formFields) {
 		fieldsArr.push({
@@ -72,26 +75,69 @@ const App = () => {
 		});
 	}
 
+	const fieldValidCheck = (inputValue, rules) => {
+		let isValid = true;
+		if (rules.required) {
+			isValid = inputValue.trim() !== '' && isValid;
+		}
+
+		if (rules.needToCheck) {
+			isValid = inputValue === userInfo.password && isValid;
+		}
+
+		if (rules.isEmail) {
+			const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+			isValid = pattern.test(inputValue) && isValid;
+		}
+
+		return isValid;
+	};
+
 	const onInputChangeHandler = (event, id) => {
+		//Handling user's input
 		let inputData = event.target.value;
 		let userInfoCopy = { ...userInfo };
-		console.log(userInfo);
 		userInfoCopy[id] = inputData;
+
+		//Checking field's validation
+		let fieldChecked = fieldValidCheck(
+			inputData,
+			formState.formFields[id].validation
+		);
+		let fieldsCopy = { ...formState.formFields };
+		fieldsCopy[id].isValid = fieldChecked;
+
+		//Whole form's validation check
+		let formIsValid = true;
+		for (const field in fieldsCopy) {
+			formIsValid = fieldsCopy[field].isValid && formIsValid;
+		}
+
+		console.log('Form is Valid', formIsValid);
 		setUserInfo({ ...userInfoCopy });
+		setFormState({
+			...formState,
+			formFields: fieldsCopy
+		});
 	};
 
 	let form = (
-		<form action='#' id='form'>
-			{fieldsArr.map((el) => (
-				<Input
-					id={el.id}
-					key={el.id}
-					name={el.config.basic.name}
-					placeholder={el.config.basic.placeholder}
-					onInput={(event) => onInputChangeHandler(event, el.id)}
-				/>
-			))}
-		</form>
+		<div>
+			<form action='#' id='form'>
+				{fieldsArr.map((el) => (
+					<Input
+						id={el.id}
+						key={el.id}
+						name={el.config.basic.name}
+						placeholder={el.config.basic.placeholder}
+						onInput={(event) => onInputChangeHandler(event, el.id)}
+						required={el.config.validation.required}
+						invalid={!el.config.isValid}
+					/>
+				))}
+			</form>
+			<button>Submit</button>
+		</div>
 	);
 
 	return (
