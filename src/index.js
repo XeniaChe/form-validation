@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-// import App from './App';
+import * as classes from './index.module.scss';
 import * as serviceWorker from './serviceWorker';
 import Input from './components/Input';
 
@@ -24,6 +23,7 @@ const App = () => {
 			isEmail: isEmail
 		};
 		this.isValid = false;
+		this.touched = false;
 	};
 
 	const [ formState, setFormState ] = useState({
@@ -43,7 +43,7 @@ const App = () => {
 				false
 			),
 			passwordCheck: new formFieldsCreate(
-				'Password check',
+				'Password checked',
 				'Repeat your password',
 				true,
 				true,
@@ -65,15 +65,10 @@ const App = () => {
 		passwordCheck: '',
 		email: ''
 	});
-
-	//Array from form.formfields object
-	const fieldsArr = [];
-	for (const key in formState.formFields) {
-		fieldsArr.push({
-			config: formState.formFields[key],
-			id: key
-		});
-	}
+	const [ submitState, setSubmit ] = useState({
+		sending: false,
+		submitted: false
+	});
 
 	const fieldValidCheck = (inputValue, rules) => {
 		let isValid = true;
@@ -106,6 +101,7 @@ const App = () => {
 		);
 		let fieldsCopy = { ...formState.formFields };
 		fieldsCopy[id].isValid = fieldChecked;
+		fieldsCopy[id].touched = true;
 
 		//Whole form's validation check
 		let formIsValid = true;
@@ -113,17 +109,83 @@ const App = () => {
 			formIsValid = fieldsCopy[field].isValid && formIsValid;
 		}
 
-		console.log('Form is Valid', formIsValid);
+		// console.log('Form is Valid', formIsValid);
 		setUserInfo({ ...userInfoCopy });
 		setFormState({
 			...formState,
-			formFields: fieldsCopy
+			formFields: fieldsCopy,
+			formValid: formIsValid
 		});
 	};
 
+	const submitEventHandler = (event) => {
+		event.preventDefault();
+
+		if (formState.formValid) {
+			setSubmit({
+				...submitState,
+				sending: true
+			});
+			fetch('http://localhost:3000/usersData', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(userInfo)
+			})
+				// .then((response) => response.json())
+				.then((res) => console.log('success', res))
+				.then(
+					setSubmit({
+						...submitState,
+						submitted: true
+					})
+				)
+				.catch(
+					(error) => console.log(error)
+					// setSubmit({
+					// 	...submitState,
+					// 	submitted: false
+					// })
+				);
+		}
+
+		// if (formState.formValid) {
+		// 	try {
+		// 		const postData = async () => {
+		// 			const response = await fetch(
+		// 				'http://localhost:3000/usersDat',
+		// 				{
+		// 					method: 'POST',
+		// 					headers: {
+		// 						'Content-Type': 'application/json'
+		// 					},
+		// 					body: JSON.stringify(userInfo)
+		// 				}
+		// 			);
+		// 			const result = await response.json();
+		// 			alert(result.message);
+		// 		};
+		// 		postData();
+		// 	} catch (error) {
+		// 		alert(error.message);
+		// 	}
+		// }
+	};
+
+	//Array from form.formfields object
+	const fieldsArr = [];
+	for (const key in formState.formFields) {
+		fieldsArr.push({
+			config: formState.formFields[key],
+			id: key
+		});
+	}
+
 	let form = (
-		<div>
-			<form action='#' id='form'>
+		<div className={classes.formBox}>
+			<h3>Insert your data</h3>
+			<form action='#' id='form' onSubmit={submitEventHandler}>
 				{fieldsArr.map((el) => (
 					<Input
 						id={el.id}
@@ -133,19 +195,15 @@ const App = () => {
 						onInput={(event) => onInputChangeHandler(event, el.id)}
 						required={el.config.validation.required}
 						invalid={!el.config.isValid}
+						touched={el.config.touched}
 					/>
 				))}
+				<button type='submit'>Submit</button>
 			</form>
-			<button>Submit</button>
 		</div>
 	);
 
-	return (
-		<div className='App'>
-			<h2>form-validation</h2>
-			{form}
-		</div>
-	);
+	return <div className={classes.App}>{form}</div>;
 };
 
 export default App;
