@@ -1,0 +1,71 @@
+*,
+*::before,
+*::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: inherit;
+}
+:root {
+	--font_family_4: 'Open Sans', sans-serif;
+	--base_color_dark: #252525;
+	--base_color_light: white;
+}
+html {
+	box-sizing: border-box;
+	font-size: 62.5%;
+}
+
+body {
+	font-family: var(--font_family_4);
+	font-weight: 300;
+	font-size: 4rem;
+}
+
+.App {
+	display: grid;
+	grid-template-columns: [full-start] minmax(3rem, 1fr) [ center-start]
+		repeat(8, [col-start] minmax(min-content, 12rem) [col-end]) [center-end]
+		minmax(3rem, 1fr) [full-end];
+	grid-template-rows: minmax(min-content, 35vh)
+		minmax(min-content, max-content);
+	margin: 8rem 5rem;
+	.formBox {
+		grid-column: col-start 1 / col-end 8;
+		display: grid;
+
+		margin-bottom: 5rem;
+		h3 {
+			font-weight: 300;
+			font-size: 3.5rem;
+			margin: 8rem 1rem;
+			padding: 1rem 3rem;
+			justify-self: center;
+			background-color: var(--base_color_dark);
+			color: var(--base_color_light);
+		}
+		form {
+			display: grid;
+		}
+	}
+}
+
+button {
+	justify-self: center;
+	text-decoration: none;
+	text-transform: uppercase;
+	border: none;
+	cursor: pointer;
+	display: inline-block;
+	padding: 1rem 2rem;
+	background-color: var(--base_color_dark);
+	color: var(--base_color_light);
+	font-size: 2rem;
+	font-weight: 300;
+	transition: all .2s;
+	border: 2px solid transparent;
+	&:hover {
+		background-color: var(--base_color_light);
+		color: var(--base_color_dark);
+		border: 2px solid var(--base_color_dark);
+	}
+}
