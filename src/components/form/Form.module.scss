@@ -38,6 +38,7 @@ button {
 	}
 	&:disabled {
 		background-color: gray;
+		cursor: auto;
 		&:hover {
 			background-color: gray;
 			color: var(--base_color_light);
