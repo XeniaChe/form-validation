@@ -29,43 +29,4 @@ body {
 	grid-template-rows: minmax(min-content, 35vh)
 		minmax(min-content, max-content);
 	margin: 8rem 5rem;
-	.formBox {
-		grid-column: col-start 1 / col-end 8;
-		display: grid;
-
-		margin-bottom: 5rem;
-		h3 {
-			font-weight: 300;
-			font-size: 3.5rem;
-			margin: 8rem 1rem;
-			padding: 1rem 3rem;
-			justify-self: center;
-			background-color: var(--base_color_dark);
-			color: var(--base_color_light);
-		}
-		form {
-			display: grid;
-		}
-	}
-}
-
-button {
-	justify-self: center;
-	text-decoration: none;
-	text-transform: uppercase;
-	border: none;
-	cursor: pointer;
-	display: inline-block;
-	padding: 1rem 2rem;
-	background-color: var(--base_color_dark);
-	color: var(--base_color_light);
-	font-size: 2rem;
-	font-weight: 300;
-	transition: all .2s;
-	border: 2px solid transparent;
-	&:hover {
-		background-color: var(--base_color_light);
-		color: var(--base_color_dark);
-		border: 2px solid var(--base_color_dark);
-	}
 }

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import * as classes from './index.module.scss';
 import * as serviceWorker from './serviceWorker';
-import Input from './components/Input';
+import Form from './components/form/Form';
 
 const App = () => {
 	const formFieldsCreate = function(
 		name,
 		placeholder,
+		type,
 		required,
 		needToCheck,
 		isEmail
@@ -16,7 +17,8 @@ const App = () => {
 			name: name,
 			placeholder: placeholder
 		};
-		// this.value = '';
+		this.type = type;
+		this.value = '';
 		this.validation = {
 			required: required,
 			needToCheck: needToCheck,
@@ -31,6 +33,7 @@ const App = () => {
 			name: new formFieldsCreate(
 				'First name',
 				'Your first name',
+				'text',
 				false,
 				false,
 				false
@@ -38,6 +41,7 @@ const App = () => {
 			password: new formFieldsCreate(
 				'Password',
 				'Insert your password',
+				'password',
 				true,
 				false,
 				false
@@ -45,6 +49,7 @@ const App = () => {
 			passwordCheck: new formFieldsCreate(
 				'Password checked',
 				'Repeat your password',
+				'password',
 				true,
 				true,
 				false
@@ -52,6 +57,7 @@ const App = () => {
 			email: new formFieldsCreate(
 				'e-mail',
 				'Your e-mail',
+				'email',
 				true,
 				false,
 				true
@@ -65,10 +71,10 @@ const App = () => {
 		passwordCheck: '',
 		email: ''
 	});
-	const [ submitState, setSubmit ] = useState({
-		sending: false,
-		submitted: false
-	});
+	// const [ submitState, setSubmit ] = useState({
+	// 	sending: false,
+	// 	submitted: false
+	// });
 
 	const fieldValidCheck = (inputValue, rules) => {
 		let isValid = true;
@@ -102,6 +108,7 @@ const App = () => {
 		let fieldsCopy = { ...formState.formFields };
 		fieldsCopy[id].isValid = fieldChecked;
 		fieldsCopy[id].touched = true;
+		fieldsCopy[id].value = inputData;
 
 		//Whole form's validation check
 		let formIsValid = true;
@@ -110,103 +117,81 @@ const App = () => {
 		}
 
 		// console.log('Form is Valid', formIsValid);
-		setUserInfo({ ...userInfoCopy });
 		setFormState({
 			...formState,
 			formFields: fieldsCopy,
 			formValid: formIsValid
 		});
+		setUserInfo({ ...userInfoCopy });
 	};
 
 	const submitEventHandler = (event) => {
 		event.preventDefault();
 
 		if (formState.formValid) {
-			setSubmit({
-				...submitState,
-				sending: true
-			});
-			fetch('http://localhost:3000/usersData', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(userInfo)
-			})
-				// .then((response) => response.json())
-				.then((res) => console.log('success', res))
-				.then(
-					setSubmit({
-						...submitState,
-						submitted: true
-					})
-				)
-				.catch(
-					(error) => console.log(error)
-					// setSubmit({
-					// 	...submitState,
-					// 	submitted: false
-					// })
-				);
+			try {
+				const postData = async () => {
+					let response = await fetch(
+						'http://localhost:3000/usersData',
+						{
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(userInfo)
+						}
+					);
+					if (response.status === 201) {
+						let data = await response.json();
+						alert('Your data was send successfully');
+						console.log("User's data:", data);
+					} else {
+						alert(
+							"Your data wasn't sent. Status: " +
+								response.statusText
+						);
+					}
+				};
+				postData();
+			} catch (error) {
+				alert('Error:' + error);
+			}
 		}
 
-		// if (formState.formValid) {
-		// 	try {
-		// 		const postData = async () => {
-		// 			const response = await fetch(
-		// 				'http://localhost:3000/usersDat',
-		// 				{
-		// 					method: 'POST',
-		// 					headers: {
-		// 						'Content-Type': 'application/json'
-		// 					},
-		// 					body: JSON.stringify(userInfo)
-		// 				}
-		// 			);
-		// 			const result = await response.json();
-		// 			alert(result.message);
-		// 		};
-		// 		postData();
-		// 	} catch (error) {
-		// 		alert(error.message);
-		// 	}
-		// }
+		//cleaning userInfo state after submission
+		let userInfoCopy = { ...userInfo };
+		for (const key in userInfoCopy) {
+			userInfoCopy[key] = '';
+		}
+		setUserInfo({
+			...userInfoCopy
+		});
+
+		//cleaning input fields after submission
+		let fieldsCopy = { ...formState.formFields };
+		for (const key in fieldsCopy) {
+			fieldsCopy[key].value = '';
+		}
+		setFormState({
+			...formState,
+			formFields: fieldsCopy,
+			formValid: false
+		});
 	};
 
-	//Array from form.formfields object
-	const fieldsArr = [];
-	for (const key in formState.formFields) {
-		fieldsArr.push({
-			config: formState.formFields[key],
-			id: key
-		});
-	}
-
-	let form = (
-		<div className={classes.formBox}>
-			<h3>Insert your data</h3>
-			<form action='#' id='form' onSubmit={submitEventHandler}>
-				{fieldsArr.map((el) => (
-					<Input
-						id={el.id}
-						key={el.id}
-						name={el.config.basic.name}
-						placeholder={el.config.basic.placeholder}
-						onInput={(event) => onInputChangeHandler(event, el.id)}
-						required={el.config.validation.required}
-						invalid={!el.config.isValid}
-						touched={el.config.touched}
-					/>
-				))}
-				<button type='submit'>Submit</button>
-			</form>
+	return (
+		<div className={classes.App}>
+			<Form
+				fields={formState.formFields}
+				onInput={onInputChangeHandler}
+				onSubmit={submitEventHandler}
+			/>
 		</div>
 	);
-
-	return <div className={classes.App}>{form}</div>;
 };
 
 export default App;
+
 ReactDOM.render(
 	<React.StrictMode>
 		<App />
