@@ -21,12 +21,12 @@ body {
 	font-size: 4rem;
 }
 
-.App {
-	display: grid;
-	grid-template-columns: [full-start] minmax(3rem, 1fr) [ center-start]
-		repeat(8, [col-start] minmax(min-content, 12rem) [col-end]) [center-end]
-		minmax(3rem, 1fr) [full-end];
-	grid-template-rows: minmax(min-content, 35vh)
-		minmax(min-content, max-content);
-	margin: 8rem 5rem;
-}
+// .App {
+// 	display: grid;
+// 	grid-template-columns: [full-start] minmax(3rem, 1fr) [ center-start]
+// 		repeat(8, [col-start] minmax(min-content, 12rem) [col-end]) [center-end]
+// 		minmax(3rem, 1fr) [full-end];
+// 	grid-template-rows: minmax(min-content, 35vh)
+// 		minmax(min-content, max-content);
+// 	margin: 8rem 5rem;
+// }
