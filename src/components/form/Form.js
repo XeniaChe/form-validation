@@ -50,9 +50,9 @@ const Input = (props) => {
 const Form = (props) => {
 	//Array from form.formfields object
 	const fieldsArr = [];
-	for (const key in props.fields) {
+	for (const key in props.form.formFields) {
 		fieldsArr.push({
-			config: props.fields[key],
+			config: props.form.formFields[key],
 			id: key
 		});
 	}
@@ -74,7 +74,9 @@ const Form = (props) => {
 						touched={el.config.touched}
 					/>
 				))}
-				<button type='submit'>Submit</button>
+				<button type='submit' disabled={!props.form.formValid}>
+					Submit
+				</button>
 			</form>
 		</div>
 	);

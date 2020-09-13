@@ -143,8 +143,8 @@ const App = () => {
 					);
 					if (response.status === 201) {
 						let data = await response.json();
-						alert('Your data was send successfully');
 						console.log("User's data:", data);
+						alert('Your data was send successfully');
 					} else {
 						alert(
 							"Your data wasn't sent. Status: " +
@@ -153,36 +153,35 @@ const App = () => {
 					}
 				};
 				postData();
+				//cleaning userInfo state after submission
+				let userInfoCopy = { ...userInfo };
+				for (const key in userInfoCopy) {
+					userInfoCopy[key] = '';
+				}
+				setUserInfo({
+					...userInfoCopy
+				});
+
+				//cleaning input fields after submission
+				let fieldsCopy = { ...formState.formFields };
+				for (const key in fieldsCopy) {
+					fieldsCopy[key].value = '';
+				}
+				setFormState({
+					...formState,
+					formFields: fieldsCopy,
+					formValid: false
+				});
 			} catch (error) {
 				alert('Error:' + error);
 			}
 		}
-
-		//cleaning userInfo state after submission
-		let userInfoCopy = { ...userInfo };
-		for (const key in userInfoCopy) {
-			userInfoCopy[key] = '';
-		}
-		setUserInfo({
-			...userInfoCopy
-		});
-
-		//cleaning input fields after submission
-		let fieldsCopy = { ...formState.formFields };
-		for (const key in fieldsCopy) {
-			fieldsCopy[key].value = '';
-		}
-		setFormState({
-			...formState,
-			formFields: fieldsCopy,
-			formValid: false
-		});
 	};
 
 	return (
 		<div className={classes.App}>
 			<Form
-				fields={formState.formFields}
+				form={formState}
 				onInput={onInputChangeHandler}
 				onSubmit={submitEventHandler}
 			/>
