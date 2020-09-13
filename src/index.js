@@ -71,10 +71,6 @@ const App = () => {
 		passwordCheck: '',
 		email: ''
 	});
-	// const [ submitState, setSubmit ] = useState({
-	// 	sending: false,
-	// 	submitted: false
-	// });
 
 	const fieldValidCheck = (inputValue, rules) => {
 		let isValid = true;

@@ -2,7 +2,6 @@ import React, { Fragment } from 'react';
 import * as classes from './Form.module.scss';
 
 const Input = (props) => {
-	// console.log('Field is invalid', props.invalid);
 	let style = [ classes.form_input ];
 	let placeholder = props.placeholder;
 
