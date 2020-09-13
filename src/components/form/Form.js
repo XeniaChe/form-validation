@@ -16,10 +16,9 @@ const Input = (props) => {
 	if (props.invalid && props.touched) {
 		style.push(classes.invalid);
 
-		labelText = 'Please, input correct data';
-		if (props.id === 'passwordCheck') {
-			labelText = 'Passwords should match';
-		}
+		props.id !== 'passwordCheck'
+			? (labelText = 'Please, input correct data')
+			: (labelText = 'Passwords should match');
 	}
 	let label = (
 		<label className={classes.form_label} htmlFor={props.id}>
