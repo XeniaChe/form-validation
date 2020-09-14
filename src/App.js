@@ -145,6 +145,14 @@ const App = () => {
 								response.statusText
 						);
 					}
+				} catch (error) {
+					console.log(error);
+					alert(
+						"We're sorry ((..  An error: " +
+							error.message +
+							' occured'
+					);
+				} finally {
 					//cleaning userInfo state after submission
 					let userInfoCopy = { ...userInfo };
 					for (const key in userInfoCopy) {
@@ -164,13 +172,6 @@ const App = () => {
 						formFields: fieldsCopy,
 						formValid: false
 					});
-				} catch (error) {
-					console.log(error);
-					alert(
-						"We're sorry ((..  An error: " +
-							error.message +
-							' occured'
-					);
 				}
 			};
 			postData();
