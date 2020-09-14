@@ -1,5 +1,5 @@
 This application uses JSON-Server API to mock a client-server connection with a real server.
- You can find db-form.json database that will contain all the submitted data in the usersData array in the root folder of this application. 
+ You can find db-form.json database that will contain all the submitted data  in the root folder of this application. 
 
 Please, follow these steps to run the fake server:
 1. install json-server globally:  
