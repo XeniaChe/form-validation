@@ -123,8 +123,8 @@ const App = () => {
 		event.preventDefault();
 
 		if (formState.formValid) {
-			try {
-				const postData = async () => {
+			const postData = async () => {
+				try {
 					let response = await fetch(
 						'http://localhost:3000/usersData',
 						{
@@ -145,30 +145,35 @@ const App = () => {
 								response.statusText
 						);
 					}
-				};
-				postData();
-				//cleaning userInfo state after submission
-				let userInfoCopy = { ...userInfo };
-				for (const key in userInfoCopy) {
-					userInfoCopy[key] = '';
-				}
-				setUserInfo({
-					...userInfoCopy
-				});
+					//cleaning userInfo state after submission
+					let userInfoCopy = { ...userInfo };
+					for (const key in userInfoCopy) {
+						userInfoCopy[key] = '';
+					}
+					setUserInfo({
+						...userInfoCopy
+					});
 
-				//cleaning input fields after submission
-				let fieldsCopy = { ...formState.formFields };
-				for (const key in fieldsCopy) {
-					fieldsCopy[key].value = '';
+					//cleaning input fields after submission
+					let fieldsCopy = { ...formState.formFields };
+					for (const key in fieldsCopy) {
+						fieldsCopy[key].value = '';
+					}
+					setFormState({
+						...formState,
+						formFields: fieldsCopy,
+						formValid: false
+					});
+				} catch (error) {
+					console.log(error);
+					alert(
+						"We're sorry ((..  An error: " +
+							error.message +
+							' occured'
+					);
 				}
-				setFormState({
-					...formState,
-					formFields: fieldsCopy,
-					formValid: false
-				});
-			} catch (error) {
-				alert('Error:' + error);
-			}
+			};
+			postData();
 		}
 	};
 
