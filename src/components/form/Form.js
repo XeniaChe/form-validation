@@ -38,6 +38,7 @@ const Input = (props) => {
 					onChange={props.onInput}
 					required={props.required}
 					value={props.value}
+					data-testid='input'
 				/>
 				{label}
 			</div>
@@ -54,6 +55,7 @@ const Form = (props) => {
 			id: key
 		});
 	}
+
 	return (
 		<div className={classes.formBox}>
 			<h3>Insert your data</h3>

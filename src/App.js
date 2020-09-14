@@ -141,7 +141,7 @@ const App = () => {
 						alert('Your data was send successfully');
 					} else {
 						alert(
-							"Your data wasn't sent. Status: " +
+							"We'\re sorry. Your data wasn't sent. Status: " +
 								response.statusText
 						);
 					}
