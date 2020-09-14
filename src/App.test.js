@@ -9,6 +9,4 @@ test('checks required fields', () => {
 	expect(inputArr[0]).not.toBeRequired();
 	expect(inputArr[3]).toBeRequired();
 	expect(inputArr.length).toBe(4);
-
-	// const
 });
