@@ -1,31 +1,10 @@
 import React, { useState } from 'react';
 import Form from './components/form/Form';
 import * as classes from './App.module.scss';
+import { fieldValidCheck, formFieldsCreate } from './services/utils';
+import Notification from './components/Notification';
 
 const App = () => {
-	const formFieldsCreate = function(
-		name,
-		placeholder,
-		type,
-		required,
-		needToCheck,
-		isEmail
-	) {
-		this.basic = {
-			name: name,
-			placeholder: placeholder
-		};
-		this.type = type;
-		this.value = '';
-		this.validation = {
-			required: required,
-			needToCheck: needToCheck,
-			isEmail: isEmail
-		};
-		this.isValid = false;
-		this.touched = false;
-	};
-
 	const [ formState, setFormState ] = useState({
 		formFields: {
 			name: new formFieldsCreate(
@@ -70,24 +49,6 @@ const App = () => {
 		email: ''
 	});
 
-	const fieldValidCheck = (inputValue, rules) => {
-		let isValid = true;
-		if (rules.required) {
-			isValid = inputValue.trim() !== '' && isValid;
-		}
-
-		if (rules.needToCheck) {
-			isValid = inputValue === userInfo.password && isValid;
-		}
-
-		if (rules.isEmail) {
-			const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-			isValid = pattern.test(inputValue) && isValid;
-		}
-
-		return isValid;
-	};
-
 	const onInputChangeHandler = (event, id) => {
 		//Handling user's input
 		let inputData = event.target.value;
@@ -97,7 +58,8 @@ const App = () => {
 		//Checking field's validation
 		let fieldChecked = fieldValidCheck(
 			inputData,
-			formState.formFields[id].validation
+			formState.formFields[id].validation,
+			userInfo
 		);
 		let fieldsCopy = { ...formState.formFields };
 		fieldsCopy[id].isValid = fieldChecked;
@@ -126,7 +88,7 @@ const App = () => {
 			const postData = async () => {
 				try {
 					let response = await fetch(
-						'http://localhost:3000/usersData',
+						'http://localhost:3003/usersData',
 						{
 							method: 'POST',
 							headers: {
