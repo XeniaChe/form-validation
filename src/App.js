@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Form from './components/form/Form';
 import * as classes from './App.module.scss';
-import { fieldValidCheck, formFieldsCreate } from './services/utils';
-import Notification from './components/Notification';
+import * as services from './services/utils';
 
 const App = () => {
 	const [ formState, setFormState ] = useState({
 		formFields: {
-			name: new formFieldsCreate(
+			name: new services.formFieldsCreate(
 				'First name',
 				'Your first name',
 				'text',
@@ -15,7 +14,7 @@ const App = () => {
 				false,
 				false
 			),
-			password: new formFieldsCreate(
+			password: new services.formFieldsCreate(
 				'Password',
 				'Insert your password',
 				'password',
@@ -23,7 +22,7 @@ const App = () => {
 				false,
 				false
 			),
-			passwordCheck: new formFieldsCreate(
+			passwordCheck: new services.formFieldsCreate(
 				'Password checked',
 				'Repeat your password',
 				'password',
@@ -31,7 +30,7 @@ const App = () => {
 				true,
 				false
 			),
-			email: new formFieldsCreate(
+			email: new services.formFieldsCreate(
 				'e-mail',
 				'Insert your e-mail',
 				'email',
@@ -39,8 +38,8 @@ const App = () => {
 				false,
 				true
 			)
-		},
-		formValid: false
+		}
+		// formValid: false
 	});
 	const [ userInfo, setUserInfo ] = useState({
 		name: '',
@@ -48,95 +47,74 @@ const App = () => {
 		passwordCheck: '',
 		email: ''
 	});
+	const [ fieldId, setFieldId ] = useState(null);
 
 	const onInputChangeHandler = (event, id) => {
-		//Handling user's input
 		let inputData = event.target.value;
 		let userInfoCopy = { ...userInfo };
 		userInfoCopy[id] = inputData;
 
-		//Checking field's validation
-		let fieldChecked = fieldValidCheck(
-			inputData,
-			formState.formFields[id].validation,
-			userInfo
-		);
 		let fieldsCopy = { ...formState.formFields };
-		fieldsCopy[id].isValid = fieldChecked;
 		fieldsCopy[id].touched = true;
 		fieldsCopy[id].value = inputData;
 
-		//Whole form's validation check
-		let formIsValid = true;
-		for (const field in fieldsCopy) {
-			formIsValid = fieldsCopy[field].isValid && formIsValid;
-		}
-
-		// console.log('Form is Valid', formIsValid);
 		setFormState({
 			...formState,
-			formFields: fieldsCopy,
-			formValid: formIsValid
+			formFields: fieldsCopy
 		});
+
 		setUserInfo({ ...userInfoCopy });
+		setFieldId(id);
 	};
+
+	//setState Callback
+	useEffect(
+		() => {
+			let fieldsCopy = { ...formState.formFields };
+			if (fieldId && fieldsCopy[fieldId].value !== '') {
+				fieldsCopy = services.fieldValidationOnID(
+					formState.formFields,
+					userInfo,
+					fieldId
+				);
+			}
+
+			setFormState((prevState) => {
+				return {
+					...prevState,
+					formFields: fieldsCopy
+				};
+			});
+		},
+		[ userInfo, fieldId ]
+	);
 
 	const submitEventHandler = (event) => {
 		event.preventDefault();
+		// overall form validation check
+		let formIsValid = services.formValidation(formState.formFields);
 
-		if (formState.formValid) {
-			const postData = async () => {
-				try {
-					let response = await fetch(
-						'http://localhost:3003/usersData',
-						{
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json'
-							},
-							body: JSON.stringify(userInfo)
-						}
-					);
-					if (response.status === 201) {
-						let data = await response.json();
-						console.log("User's data:", data);
-						alert('Your data was send successfully');
-					} else {
-						alert(
-							"We'\re sorry. Your data wasn't sent. Status: " +
-								response.statusText
-						);
-					}
-				} catch (error) {
-					console.log(error);
-					alert(
-						"We're sorry ((..  An error: " +
-							error.message +
-							' occured'
-					);
-				} finally {
-					//cleaning userInfo state after submission
-					let userInfoCopy = { ...userInfo };
-					for (const key in userInfoCopy) {
-						userInfoCopy[key] = '';
-					}
-					setUserInfo({
-						...userInfoCopy
-					});
+		if (formIsValid) {
+			services.postData(userInfo);
 
-					//cleaning input fields after submission
-					let fieldsCopy = { ...formState.formFields };
-					for (const key in fieldsCopy) {
-						fieldsCopy[key].value = '';
-					}
-					setFormState({
-						...formState,
-						formFields: fieldsCopy,
-						formValid: false
-					});
-				}
-			};
-			postData();
+			//cleaning userInfo state after submission
+			let cleanedUserInfo = services.clearUserInfo(userInfo);
+			setUserInfo({
+				...cleanedUserInfo
+			});
+
+			//cleaning input fields after submission
+			let cleanedFormFields = services.clearInputFields(
+				formState.formFields
+			);
+			setFormState({
+				...formState.formFields,
+				formFields: cleanedFormFields
+			});
+
+			setFieldId(null);
+		} else {
+			console.log('Form is not validating');
 		}
 	};
 
