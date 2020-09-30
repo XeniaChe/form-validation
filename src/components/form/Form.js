@@ -74,12 +74,12 @@ const Form = (props) => {
 						touched={el.config.touched}
 					/>
 				))}
-				<button type='submit' disabled={!props.form.formValid}>
-					Submit
-				</button>
+				<button type='submit'>Submit</button>
 			</form>
 		</div>
 	);
 };
 
 export default Form;
+
+// disabled={!props.form.formValid}
